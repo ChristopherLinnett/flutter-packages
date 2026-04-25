@@ -270,7 +270,12 @@ void main() {
     });
 
     test('should treat equal mirrorFrontCamera values as equal', () {
-      const settingsA = MediaSettings(
+      // Non-const constructors so Dart cannot canonicalise the two
+      // expressions into the same instance — otherwise the assertion would
+      // be satisfied by the `identical(...)` short-circuit in operator==
+      // rather than by the field-by-field comparison.
+      // ignore: prefer_const_constructors
+      final settingsA = MediaSettings(
         resolutionPreset: preset1,
         fps: fps1,
         videoBitrate: videoBitrate1,
@@ -278,7 +283,8 @@ void main() {
         enableAudio: enableAudio1,
         mirrorFrontCamera: false,
       );
-      const settingsB = MediaSettings(
+      // ignore: prefer_const_constructors
+      final settingsB = MediaSettings(
         resolutionPreset: preset1,
         fps: fps1,
         videoBitrate: videoBitrate1,
@@ -287,6 +293,7 @@ void main() {
         mirrorFrontCamera: false,
       );
 
+      expect(identical(settingsA, settingsB), isFalse);
       expect(settingsA == settingsB, isTrue);
     });
 
@@ -323,8 +330,18 @@ void main() {
     });
 
     test('Two default-constructed settings should be equal', () {
+      // Non-const so Dart cannot canonicalise both expressions to the same
+      // instance — if it did, the assertion would short-circuit through
+      // `identical(...)` in operator== and never exercise the field-by-field
+      // comparison this test is meant to cover.
+      // ignore: prefer_const_constructors
+      final defaultsA = MediaSettings();
+      // ignore: prefer_const_constructors
+      final defaultsB = MediaSettings();
+
+      expect(identical(defaultsA, defaultsB), isFalse);
       expect(
-        const MediaSettings() == const MediaSettings(),
+        defaultsA == defaultsB,
         isTrue,
         reason:
             'MediaSettings == operator should treat two default-constructed '
