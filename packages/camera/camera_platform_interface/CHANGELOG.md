@@ -1,3 +1,7 @@
+## 2.14.0
+
+* Adds optional `mirrorFrontCamera` field to `MediaSettings` to control front-camera mirroring on supporting platforms.
+
 ## 2.13.0
 
 * Updates minimum supported SDK version to Flutter 3.35/Dart 3.9.
