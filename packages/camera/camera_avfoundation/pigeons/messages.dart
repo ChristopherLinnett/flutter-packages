@@ -162,6 +162,7 @@ class PlatformMediaSettings {
     required this.videoBitrate,
     required this.audioBitrate,
     required this.enableAudio,
+    this.mirrorFrontCamera,
   });
 
   final PlatformResolutionPreset resolutionPreset;
@@ -169,6 +170,13 @@ class PlatformMediaSettings {
   final int? videoBitrate;
   final int? audioBitrate;
   final bool enableAudio;
+
+  /// Optional override for front-camera mirroring on iOS. When non-null, the
+  /// host honours this value at AVCaptureConnection construction time; null
+  /// preserves the platform default. Must remain the last field in this
+  /// class — pigeon serialises by declaration order and existing field
+  /// indices are part of the wire contract.
+  final bool? mirrorFrontCamera;
 }
 
 // Pigeon equivalent of CGPoint.

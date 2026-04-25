@@ -350,6 +350,7 @@ class PlatformMediaSettings {
     this.videoBitrate,
     this.audioBitrate,
     required this.enableAudio,
+    this.mirrorFrontCamera,
   });
 
   PlatformResolutionPreset resolutionPreset;
@@ -362,6 +363,8 @@ class PlatformMediaSettings {
 
   bool enableAudio;
 
+  bool? mirrorFrontCamera;
+
   List<Object?> _toList() {
     return <Object?>[
       resolutionPreset,
@@ -369,6 +372,7 @@ class PlatformMediaSettings {
       videoBitrate,
       audioBitrate,
       enableAudio,
+      mirrorFrontCamera,
     ];
   }
 
@@ -384,6 +388,7 @@ class PlatformMediaSettings {
       videoBitrate: result[2] as int?,
       audioBitrate: result[3] as int?,
       enableAudio: result[4]! as bool,
+      mirrorFrontCamera: result[5] as bool?,
     );
   }
 

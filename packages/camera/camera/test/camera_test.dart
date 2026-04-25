@@ -151,6 +151,41 @@ void main() {
       expect(cameraController.mediaSettings.fps, isNull);
       expect(cameraController.mediaSettings.videoBitrate, isNull);
       expect(cameraController.mediaSettings.audioBitrate, isNull);
+      expect(
+        cameraController.mediaSettings.mirrorFrontCamera,
+        isNull,
+        reason:
+            'Omitting mirrorFrontCamera should leave the platform default in '
+            'place (null on MediaSettings)',
+      );
+    });
+
+    test('mirrorFrontCamera: false propagates to MediaSettings', () {
+      final cameraController = CameraController(
+        const CameraDescription(
+          name: 'front',
+          lensDirection: CameraLensDirection.front,
+          sensorOrientation: 90,
+        ),
+        ResolutionPreset.high,
+        mirrorFrontCamera: false,
+      );
+
+      expect(cameraController.mediaSettings.mirrorFrontCamera, isFalse);
+    });
+
+    test('mirrorFrontCamera: true propagates to MediaSettings', () {
+      final cameraController = CameraController(
+        const CameraDescription(
+          name: 'front',
+          lensDirection: CameraLensDirection.front,
+          sensorOrientation: 90,
+        ),
+        ResolutionPreset.high,
+        mirrorFrontCamera: true,
+      );
+
+      expect(cameraController.mediaSettings.mirrorFrontCamera, isTrue);
     });
 
     test('can be disposed', () async {

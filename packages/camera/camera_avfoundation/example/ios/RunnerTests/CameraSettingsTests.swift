@@ -354,3 +354,54 @@ final class CameraSettingsTests: XCTestCase {
     )
   }
 }
+
+/// Truth-table coverage for the pure mirroring-policy function used by
+/// `DefaultCamera.createConnection`. Lives alongside `CameraSettingsTests`
+/// to share the existing RunnerTests target wiring.
+final class CameraConnectionMirroringTests: XCTestCase {
+  func testResolverReturnsTrueForFrontCameraWhenOverrideIsNil() {
+    XCTAssertEqual(
+      DefaultCamera.resolveFrontCameraMirroring(position: .front, explicitOverride: nil),
+      true,
+      "Front camera with no override must preserve the existing mirrored default")
+  }
+
+  func testResolverReturnsTrueForFrontCameraWhenOverrideIsTrue() {
+    XCTAssertEqual(
+      DefaultCamera.resolveFrontCameraMirroring(position: .front, explicitOverride: true),
+      true,
+      "Explicit override of true on front camera should pass through unchanged")
+  }
+
+  func testResolverReturnsFalseForFrontCameraWhenOverrideIsFalse() {
+    XCTAssertEqual(
+      DefaultCamera.resolveFrontCameraMirroring(position: .front, explicitOverride: false),
+      false,
+      "Caller opt-out must propagate so the connection is not mirrored")
+  }
+
+  func testResolverReturnsNilForBackCameraWhenOverrideIsNil() {
+    XCTAssertNil(
+      DefaultCamera.resolveFrontCameraMirroring(position: .back, explicitOverride: nil),
+      "Back camera must never have its mirroring flag mutated")
+  }
+
+  func testResolverReturnsNilForBackCameraWhenOverrideIsTrue() {
+    XCTAssertNil(
+      DefaultCamera.resolveFrontCameraMirroring(position: .back, explicitOverride: true),
+      "mirrorFrontCamera is front-only by design; back camera must remain untouched")
+  }
+
+  func testResolverReturnsNilForBackCameraWhenOverrideIsFalse() {
+    XCTAssertNil(
+      DefaultCamera.resolveFrontCameraMirroring(position: .back, explicitOverride: false),
+      "mirrorFrontCamera is front-only by design; back camera must remain "
+        + "untouched even when the override is false")
+  }
+
+  func testResolverReturnsNilForUnspecifiedPositionWhenOverrideIsNil() {
+    XCTAssertNil(
+      DefaultCamera.resolveFrontCameraMirroring(position: .unspecified, explicitOverride: nil),
+      "External / unspecified-position cameras inherit AVFoundation defaults")
+  }
+}

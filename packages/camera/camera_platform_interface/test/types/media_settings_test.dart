@@ -46,6 +46,13 @@ void main() {
         reason:
             'MediaSettings constructor should have false default enableAudio',
       );
+
+      expect(
+        settingsWithNoParameters.mirrorFrontCamera,
+        isNull,
+        reason:
+            'MediaSettings constructor should have null default mirrorFrontCamera',
+      );
     },
   );
 
@@ -56,6 +63,7 @@ void main() {
       videoBitrate: 128000,
       audioBitrate: 32000,
       enableAudio: true,
+      mirrorFrontCamera: false,
     );
 
     expect(
@@ -88,6 +96,13 @@ void main() {
       true,
       reason: 'MediaSettings constructor should hold enableAudio parameter',
     );
+
+    expect(
+      settings.mirrorFrontCamera,
+      false,
+      reason:
+          'MediaSettings constructor should hold mirrorFrontCamera parameter',
+    );
   });
 
   test('MediaSettings hash should be Object.hash of passed parameters', () {
@@ -97,13 +112,44 @@ void main() {
       videoBitrate: 128000,
       audioBitrate: 32000,
       enableAudio: true,
+      mirrorFrontCamera: false,
     );
 
     expect(
       settings.hashCode,
-      Object.hash(ResolutionPreset.low, 20, 128000, 32000, true),
+      Object.hash(ResolutionPreset.low, 20, 128000, 32000, true, false),
       reason:
           'MediaSettings hash() should be equal to Object.hash of parameters',
+    );
+  });
+
+  test('MediaSettings toString should include mirrorFrontCamera', () {
+    const settings = MediaSettings(
+      resolutionPreset: ResolutionPreset.low,
+      fps: 20,
+      videoBitrate: 128000,
+      audioBitrate: 32000,
+      enableAudio: true,
+      mirrorFrontCamera: false,
+    );
+
+    expect(
+      settings.toString(),
+      contains('mirrorFrontCamera: false'),
+      reason:
+          'MediaSettings toString should include mirrorFrontCamera value',
+    );
+  });
+
+  test('MediaSettings toString should include mirrorFrontCamera when null', () {
+    const settings = MediaSettings();
+
+    expect(
+      settings.toString(),
+      contains('mirrorFrontCamera: null'),
+      reason:
+          'MediaSettings toString should expose mirrorFrontCamera even when '
+          'unset, so the field remains discoverable in logs',
     );
   });
 
@@ -189,6 +235,68 @@ void main() {
       expect(settings1 == settings2, isFalse);
     });
 
+    test('should compare mirrorFrontCamera (null vs false)', () {
+      const settings2 = MediaSettings(
+        resolutionPreset: preset1,
+        fps: fps1,
+        videoBitrate: videoBitrate1,
+        audioBitrate: audioBitrate1,
+        enableAudio: enableAudio1,
+        mirrorFrontCamera: false,
+      );
+
+      expect(settings1 == settings2, isFalse);
+    });
+
+    test('should compare mirrorFrontCamera (true vs false)', () {
+      const settingsTrue = MediaSettings(
+        resolutionPreset: preset1,
+        fps: fps1,
+        videoBitrate: videoBitrate1,
+        audioBitrate: audioBitrate1,
+        enableAudio: enableAudio1,
+        mirrorFrontCamera: true,
+      );
+      const settingsFalse = MediaSettings(
+        resolutionPreset: preset1,
+        fps: fps1,
+        videoBitrate: videoBitrate1,
+        audioBitrate: audioBitrate1,
+        enableAudio: enableAudio1,
+        mirrorFrontCamera: false,
+      );
+
+      expect(settingsTrue == settingsFalse, isFalse);
+    });
+
+    test('should treat equal mirrorFrontCamera values as equal', () {
+      // Non-const constructors so Dart cannot canonicalise the two
+      // expressions into the same instance — otherwise the assertion would
+      // be satisfied by the `identical(...)` short-circuit in operator==
+      // rather than by the field-by-field comparison.
+      // ignore: prefer_const_constructors
+      final settingsA = MediaSettings(
+        resolutionPreset: preset1,
+        fps: fps1,
+        videoBitrate: videoBitrate1,
+        audioBitrate: audioBitrate1,
+        enableAudio: enableAudio1,
+        mirrorFrontCamera: false,
+      );
+      // ignore: prefer_const_constructors
+      final settingsB = MediaSettings(
+        resolutionPreset: preset1,
+        fps: fps1,
+        videoBitrate: videoBitrate1,
+        audioBitrate: audioBitrate1,
+        enableAudio: enableAudio1,
+        mirrorFrontCamera: false,
+      );
+
+      expect(identical(settingsA, settingsB), isFalse);
+      expect(settingsA == settingsB, isTrue);
+    });
+
     test('should return true when all parameters are equal', () {
       const sameSettings = MediaSettings(
         resolutionPreset: preset1,
@@ -218,6 +326,26 @@ void main() {
         isFalse,
         reason:
             'MediaSettings == operator should return false for objects of different types',
+      );
+    });
+
+    test('Two default-constructed settings should be equal', () {
+      // Non-const so Dart cannot canonicalise both expressions to the same
+      // instance — if it did, the assertion would short-circuit through
+      // `identical(...)` in operator== and never exercise the field-by-field
+      // comparison this test is meant to cover.
+      // ignore: prefer_const_constructors
+      final defaultsA = MediaSettings();
+      // ignore: prefer_const_constructors
+      final defaultsB = MediaSettings();
+
+      expect(identical(defaultsA, defaultsB), isFalse);
+      expect(
+        defaultsA == defaultsB,
+        isTrue,
+        reason:
+            'MediaSettings == operator should treat two default-constructed '
+            'instances as equal (all fields default identically)',
       );
     });
   });

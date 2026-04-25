@@ -133,10 +133,31 @@ final class DefaultCamera: NSObject, Camera {
       details: error.domain)
   }
 
+  /// Resolves whether — and how — to set `isVideoMirrored` on the video
+  /// connection for a given camera position, based on the optional caller
+  /// override carried in `MediaSettings.mirrorFrontCamera`.
+  ///
+  /// Returns `nil` when the connection's mirroring flag must NOT be touched
+  /// (i.e. for any non-front-facing camera, regardless of the override). This
+  /// preserves AVFoundation's default state for back/external cameras.
+  ///
+  /// For a front-facing camera, returns the override when supplied, otherwise
+  /// the historical default of `true`. Splitting this decision into a pure
+  /// function lets unit tests cover the truth table without instantiating an
+  /// AVCaptureSession.
+  static func resolveFrontCameraMirroring(
+    position: AVCaptureDevice.Position,
+    explicitOverride: Bool?
+  ) -> Bool? {
+    guard position == .front else { return nil }
+    return explicitOverride ?? true
+  }
+
   private static func createConnection(
     captureDevice: CaptureDevice,
     videoFormat: FourCharCode,
-    captureDeviceInputFactory: CaptureDeviceInputFactory
+    captureDeviceInputFactory: CaptureDeviceInputFactory,
+    explicitMirrorOverride: Bool?
   ) throws -> (CaptureInput, CaptureVideoDataOutput, AVCaptureConnection) {
     // Setup video capture input.
     let captureVideoInput = try captureDeviceInputFactory.deviceInput(with: captureDevice)
@@ -153,8 +174,16 @@ final class DefaultCamera: NSObject, Camera {
       inputPorts: captureVideoInput.ports,
       output: captureVideoOutput.avOutput)
 
-    if captureDevice.position == .front {
-      connection.isVideoMirrored = true
+    // Some hardware (e.g. external cameras) reports
+    // `isVideoMirroringSupported == false`; assigning `isVideoMirrored` in that
+    // state is undefined and can throw, so the assignment is gated on both
+    // the policy resolver returning a value AND the connection accepting it.
+    if let shouldMirror = resolveFrontCameraMirroring(
+      position: captureDevice.position,
+      explicitOverride: explicitMirrorOverride),
+      connection.isVideoMirroringSupported
+    {
+      connection.isVideoMirrored = shouldMirror
     }
 
     return (captureVideoInput, captureVideoOutput, connection)
@@ -189,7 +218,8 @@ final class DefaultCamera: NSObject, Camera {
     (captureVideoInput, captureVideoOutput, connection) = try DefaultCamera.createConnection(
       captureDevice: captureDevice,
       videoFormat: videoFormat,
-      captureDeviceInputFactory: configuration.captureDeviceInputFactory)
+      captureDeviceInputFactory: configuration.captureDeviceInputFactory,
+      explicitMirrorOverride: configuration.mediaSettings.mirrorFrontCamera)
 
     super.init()
 
@@ -1142,7 +1172,8 @@ final class DefaultCamera: NSObject, Camera {
       (captureVideoInput, captureVideoOutput, newConnection) = try DefaultCamera.createConnection(
         captureDevice: captureDevice,
         videoFormat: videoFormat,
-        captureDeviceInputFactory: captureDeviceInputFactory)
+        captureDeviceInputFactory: captureDeviceInputFactory,
+        explicitMirrorOverride: mediaSettings.mirrorFrontCamera)
 
       captureVideoOutput.setSampleBufferDelegate(self, queue: captureSessionQueue)
     } catch {

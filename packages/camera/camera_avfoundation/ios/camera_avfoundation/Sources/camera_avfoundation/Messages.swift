@@ -382,6 +382,7 @@ struct PlatformMediaSettings: Hashable {
   var videoBitrate: Int64? = nil
   var audioBitrate: Int64? = nil
   var enableAudio: Bool
+  var mirrorFrontCamera: Bool? = nil
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
   static func fromList(_ pigeonVar_list: [Any?]) -> PlatformMediaSettings? {
@@ -390,13 +391,15 @@ struct PlatformMediaSettings: Hashable {
     let videoBitrate: Int64? = nilOrValue(pigeonVar_list[2])
     let audioBitrate: Int64? = nilOrValue(pigeonVar_list[3])
     let enableAudio = pigeonVar_list[4] as! Bool
+    let mirrorFrontCamera: Bool? = nilOrValue(pigeonVar_list[5])
 
     return PlatformMediaSettings(
       resolutionPreset: resolutionPreset,
       framesPerSecond: framesPerSecond,
       videoBitrate: videoBitrate,
       audioBitrate: audioBitrate,
-      enableAudio: enableAudio
+      enableAudio: enableAudio,
+      mirrorFrontCamera: mirrorFrontCamera
     )
   }
   func toList() -> [Any?] {
@@ -406,6 +409,7 @@ struct PlatformMediaSettings: Hashable {
       videoBitrate,
       audioBitrate,
       enableAudio,
+      mirrorFrontCamera,
     ]
   }
   static func == (lhs: PlatformMediaSettings, rhs: PlatformMediaSettings) -> Bool {

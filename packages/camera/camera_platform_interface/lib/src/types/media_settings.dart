@@ -19,6 +19,7 @@ class MediaSettings {
     this.videoBitrate,
     this.audioBitrate,
     this.enableAudio = false,
+    this.mirrorFrontCamera,
   }) : assert(fps == null || fps > 0, 'fps must be null or greater than zero'),
        assert(
          videoBitrate == null || videoBitrate > 0,
@@ -44,6 +45,19 @@ class MediaSettings {
   /// Controls audio presence in recorded video.
   final bool enableAudio;
 
+  /// Whether to mirror the front camera output (preview, video data output,
+  /// and recorded video) on platforms that support a configurable front-camera
+  /// mirror flag.
+  ///
+  /// When `null` (the default), each platform implementation uses its current
+  /// behaviour. On iOS, omitting this field (`null`) currently produces the
+  /// same connection state as passing `true`; pass `false` to opt out of
+  /// mirroring.
+  ///
+  /// Has no effect on platform implementations that do not honour this field
+  /// or on cameras that are not front-facing.
+  final bool? mirrorFrontCamera;
+
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) {
@@ -57,7 +71,8 @@ class MediaSettings {
         fps == other.fps &&
         videoBitrate == other.videoBitrate &&
         audioBitrate == other.audioBitrate &&
-        enableAudio == other.enableAudio;
+        enableAudio == other.enableAudio &&
+        mirrorFrontCamera == other.mirrorFrontCamera;
   }
 
   @override
@@ -67,6 +82,7 @@ class MediaSettings {
     videoBitrate,
     audioBitrate,
     enableAudio,
+    mirrorFrontCamera,
   );
 
   @override
@@ -76,6 +92,7 @@ class MediaSettings {
         'fps: $fps, '
         'videoBitrate: $videoBitrate, '
         'audioBitrate: $audioBitrate, '
-        'enableAudio: $enableAudio}';
+        'enableAudio: $enableAudio, '
+        'mirrorFrontCamera: $mirrorFrontCamera}';
   }
 }
