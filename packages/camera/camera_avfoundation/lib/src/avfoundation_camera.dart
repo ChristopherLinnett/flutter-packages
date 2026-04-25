@@ -101,6 +101,7 @@ class AVFoundationCamera extends CameraPlatform {
           videoBitrate: mediaSettings?.videoBitrate,
           audioBitrate: mediaSettings?.audioBitrate,
           enableAudio: mediaSettings?.enableAudio ?? true,
+          mirrorFrontCamera: mediaSettings?.mirrorFrontCamera,
         ),
       );
     } on PlatformException catch (e) {

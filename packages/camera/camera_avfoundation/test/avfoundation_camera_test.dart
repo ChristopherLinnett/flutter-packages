@@ -101,6 +101,90 @@ void main() {
     );
 
     test(
+      'createCameraWithSettings forwards mirrorFrontCamera: null to the host API by default',
+      () async {
+        final mockApi = MockCameraApi();
+        when(mockApi.create(any, any)).thenAnswer((_) async => 6);
+        final camera = AVFoundationCamera(api: mockApi);
+
+        await camera.createCameraWithSettings(
+          const CameraDescription(
+            name: 'front',
+            lensDirection: CameraLensDirection.front,
+            sensorOrientation: 0,
+          ),
+          const MediaSettings(resolutionPreset: ResolutionPreset.high),
+        );
+
+        final VerificationResult verification = verify(
+          mockApi.create(captureAny, captureAny),
+        );
+        final settings = verification.captured[1] as PlatformMediaSettings?;
+        expect(
+          settings?.mirrorFrontCamera,
+          isNull,
+          reason:
+              'Omitting mirrorFrontCamera on MediaSettings should forward null '
+              'to the host API so the platform default applies',
+        );
+      },
+    );
+
+    test(
+      'createCameraWithSettings forwards mirrorFrontCamera: false to the host API',
+      () async {
+        final mockApi = MockCameraApi();
+        when(mockApi.create(any, any)).thenAnswer((_) async => 7);
+        final camera = AVFoundationCamera(api: mockApi);
+
+        await camera.createCameraWithSettings(
+          const CameraDescription(
+            name: 'front',
+            lensDirection: CameraLensDirection.front,
+            sensorOrientation: 0,
+          ),
+          const MediaSettings(
+            resolutionPreset: ResolutionPreset.high,
+            mirrorFrontCamera: false,
+          ),
+        );
+
+        final VerificationResult verification = verify(
+          mockApi.create(captureAny, captureAny),
+        );
+        final settings = verification.captured[1] as PlatformMediaSettings?;
+        expect(settings?.mirrorFrontCamera, isFalse);
+      },
+    );
+
+    test(
+      'createCameraWithSettings forwards mirrorFrontCamera: true to the host API',
+      () async {
+        final mockApi = MockCameraApi();
+        when(mockApi.create(any, any)).thenAnswer((_) async => 8);
+        final camera = AVFoundationCamera(api: mockApi);
+
+        await camera.createCameraWithSettings(
+          const CameraDescription(
+            name: 'front',
+            lensDirection: CameraLensDirection.front,
+            sensorOrientation: 0,
+          ),
+          const MediaSettings(
+            resolutionPreset: ResolutionPreset.high,
+            mirrorFrontCamera: true,
+          ),
+        );
+
+        final VerificationResult verification = verify(
+          mockApi.create(captureAny, captureAny),
+        );
+        final settings = verification.captured[1] as PlatformMediaSettings?;
+        expect(settings?.mirrorFrontCamera, isTrue);
+      },
+    );
+
+    test(
       'Should throw CameraException when create throws a PlatformException',
       () {
         // Arrange
