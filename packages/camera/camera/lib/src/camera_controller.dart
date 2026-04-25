@@ -245,6 +245,12 @@ class CameraController extends ValueNotifier<CameraValue> {
   /// - [fps] controls rate at which frames should be captured by the camera in frames per second.
   /// - [videoBitrate] controls the video encoding bit rate for recording.
   /// - [audioBitrate] controls the audio encoding bit rate for recording.
+  ///
+  /// - [mirrorFrontCamera] overrides the platform-default front-camera
+  ///   mirroring on platforms that honour the setting (currently iOS). When
+  ///   `null`, the platform default applies — on iOS that is the existing
+  ///   mirrored behaviour; pass `false` to receive an unmirrored front-camera
+  ///   image. Has no effect on back/external cameras.
 
   CameraController(
     CameraDescription description,
@@ -253,6 +259,7 @@ class CameraController extends ValueNotifier<CameraValue> {
     int? fps,
     int? videoBitrate,
     int? audioBitrate,
+    bool? mirrorFrontCamera,
     this.imageFormatGroup,
   }) : mediaSettings = MediaSettings(
          resolutionPreset: resolutionPreset,
@@ -260,6 +267,7 @@ class CameraController extends ValueNotifier<CameraValue> {
          fps: fps,
          videoBitrate: videoBitrate,
          audioBitrate: audioBitrate,
+         mirrorFrontCamera: mirrorFrontCamera,
        ),
        super(CameraValue.uninitialized(description));
 

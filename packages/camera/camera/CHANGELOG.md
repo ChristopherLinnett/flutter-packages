@@ -1,3 +1,7 @@
+## 0.12.1
+
+* Adds `mirrorFrontCamera` parameter to `CameraController` to control front-camera mirroring on iOS.
+
 ## 0.12.0+1
 
 * Makes `Optional.of` constructor `const`.
