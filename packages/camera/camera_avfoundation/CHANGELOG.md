@@ -1,3 +1,7 @@
+## 0.10.2
+
+* Adds support for the `mirrorFrontCamera` `MediaSettings` field to opt out of front-camera video mirroring.
+
 ## 0.10.1
 
 * Fixes fatal crash on iPhone 17 when using `ResolutionPreset.max`.
